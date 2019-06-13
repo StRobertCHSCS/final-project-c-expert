@@ -1,6 +1,7 @@
 import arcade
 import math
 import os
+import pyglet
 
 
 SCREEN_WIDTH = 1500
@@ -109,6 +110,7 @@ class MyGame(arcade.Window):
 
         self.enemylaser_list.update()
         self.bullet1_list.update()
+        self.bullet2_list.update()
 
     def on_mouse_motion(self, x, y, delta_x, delta_y):
 
@@ -138,6 +140,33 @@ class MyGame(arcade.Window):
 
         self.bullet1_list.update()
 
+    def on_key_press(self, key, modifiers):
+
+        # Give the bullet a speed
+        bullet2 = arcade.Sprite("images/bullet2.png", 0.5)
+        bullet2.change_y = BULLET2_SPEED
+
+        # Position the bullet
+        bullet2.center_x = self.player.center_x
+        bullet2.bottom = self.player.top
+
+        # Add the bullet to the appropriate lists
+        self.bullet2_list.append(bullet2)
+
+        self.bullet2_list.update()
+        if key == arcade.key.SPACE:
+            bullet2.angle = 90
+        else :
+            bullet2.kill()
+
+    # Loop through each bullet
+        for bullet2 in self.bullet2_list:
+
+            if bullet2.bottom > SCREEN_HEIGHT:
+                bullet2.kill()
+
+            self.bullet2_list.update()
+
 
 def update(self):
     """ Movement and game logic """
@@ -145,6 +174,7 @@ def update(self):
     # Call update on bullet sprites
     self.bullet1_list.update()
     self.enemylaser_list.update()
+    self.bullet2_list.update()
 
     # Loop through each bullet
     for bullet1 in self.bullet1_list:
@@ -156,31 +186,11 @@ def update(self):
         if enemylaser.bottom > SCREEN_HEIGHT:
             enemylaser.kill()
 
+    # Loop bullet 2
 
-def on_key_press(self, key):
-
-    bullet2 = arcade.Sprite("images/player_bullets.png", 0.1)
-
-    if key == arcade.key.SPACE: bullet2.angle = 90
-
-    # Give the bullet a speed
-    bullet2.change_y = BULLET2_SPEED
-
-    # Position the bullet
-    bullet2.center_x = self.player.center_x
-    bullet2.bottom = self.player.top
-
-    # Add the bullet to the appropriate lists
-    self.bullet2_list.append(bullet2)
-
-    self.bullet2_list.update()
-
-    # Loop through each bullet
     for bullet2 in self.bullet2_list:
-
         if bullet2.bottom > SCREEN_HEIGHT:
             bullet2.kill()
-
 
 
 def main():
