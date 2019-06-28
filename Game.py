@@ -38,16 +38,16 @@ class EnemySprite(arcade.Sprite):
             self.center_y = TOP_LIMIT
 
 
-class ShipSprite(arcade.Sprite):
+class PlayerSprite(arcade.Sprite):
     def __init__(self, filename, scale):
         super().__init__(filename, scale)
         self.respawning = 0
         self.respawn()
 
     def respawn(self):
+        self.center_y = SCREEN_HEIGHT / 2
         self.respawning = 1
         self.center_x = SCREEN_WIDTH / 2
-        self.center_y = SCREEN_HEIGHT / 2
         self.angle = 0
 
     def update(self):
@@ -98,7 +98,7 @@ class MyGame(arcade.Window):
         self.ship_life_list = arcade.SpriteList()
 
         self.score = 0
-        self.player_sprite = ShipSprite("images/plane.gif", 0.2)
+        self.player_sprite = PlayerSprite("images/plane.gif", 0.2)
         self.all_sprites_list.append(self.player_sprite)
         self.lives = 3
 
