@@ -9,8 +9,8 @@ SCREEN_WIDTH = 1500
 OFFSCREEN_SPACE = 200
 SCREEN_HEIGHT = 800
 SCREEN_TITLE = "Alien Cleaner"
-LEFT_LIMIT = -OFFSCREEN_SPACE
 RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
+LEFT_LIMIT = -OFFSCREEN_SPACE
 BOTTOM_LIMIT = -OFFSCREEN_SPACE
 TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
 
@@ -19,6 +19,23 @@ class TurningSprite(arcade.Sprite):
     def update(self):
         super().update()
         self.angle = math.degrees(math.atan2(self.change_y, self.change_x))
+
+
+class EnemySprite(arcade.Sprite):
+    def __init__(self, image_file_name, scale):
+        super().__init__(image_file_name, scale=scale)
+        self.size = 0
+
+    def update(self):
+        super().update()
+        if self.center_x < LEFT_LIMIT:
+            self.center_x = RIGHT_LIMIT
+        if self.center_x > RIGHT_LIMIT:
+            self.center_x = LEFT_LIMIT
+        if self.center_y > TOP_LIMIT:
+            self.center_y = BOTTOM_LIMIT
+        if self.center_y < BOTTOM_LIMIT:
+            self.center_y = TOP_LIMIT
 
 
 class ShipSprite(arcade.Sprite):
@@ -44,23 +61,6 @@ class ShipSprite(arcade.Sprite):
         super().update()
 
 
-class EnemySprite(arcade.Sprite):
-    def __init__(self, image_file_name, scale):
-        super().__init__(image_file_name, scale=scale)
-        self.size = 0
-
-    def update(self):
-        super().update()
-        if self.center_x < LEFT_LIMIT:
-            self.center_x = RIGHT_LIMIT
-        if self.center_x > RIGHT_LIMIT:
-            self.center_x = LEFT_LIMIT
-        if self.center_y > TOP_LIMIT:
-            self.center_y = BOTTOM_LIMIT
-        if self.center_y < BOTTOM_LIMIT:
-            self.center_y = TOP_LIMIT
-
-
 class BulletSprite(TurningSprite):
     def update(self):
         super().update()
@@ -76,6 +76,8 @@ class MyGame(arcade.Window):
         os.chdir(file_path)
 
         self.frame_count = 0
+        self.background = arcade.load_texture("images/background.png")
+
         self.set_mouse_visible(False)
         self.game_over = False
         self.all_sprites_list = None
@@ -109,10 +111,7 @@ class MyGame(arcade.Window):
             self.all_sprites_list.append(life)
             self.ship_life_list.append(life)
 
-        image_list = ("images/enemy1.gif",
-                      "images/enemy1.gif",
-                      "images/enemy1.gif",
-                      "images/enemy1.gif",
+        image_list = ("images/enemy1.gif", "images/enemy1.gif", "images/enemy1.gif", "images/enemy1.gif",
                       "images/enemy1.gif")
 
         for i in range(STARTING_ENEMY_COUNT):
@@ -134,13 +133,15 @@ class MyGame(arcade.Window):
     def on_draw(self):
         arcade.start_render()
 
+        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
         self.all_sprites_list.draw()
 
         output = f"Score: {self.score}"
-        arcade.draw_text(output, 1250, 70, arcade.color.WHITE, 14)
+        arcade.draw_text(output, 1250, 70, arcade.color.BLACK_BEAN, 15)
 
         output = f"Enemies Obliterated: {len(self.enemy_list)}"
-        arcade.draw_text(output, 1250, 50, arcade.color.WHITE, 14)
+        arcade.draw_text(output, 1250, 50, arcade.color.RED_DEVIL, 15)
 
     def on_key_release(self, symbol, modifiers):
         if symbol == arcade.key.A:
@@ -148,16 +149,12 @@ class MyGame(arcade.Window):
         elif symbol == arcade.key.D:
             self.player_sprite.change_angle = 0
 
-    def on_mouse_motion(self, x, y, delta_x, delta_y):
-        self.player_sprite.center_x = x
-        self.player_sprite.center_y = y
-
     def on_key_press(self, symbol, modifiers):
         if not self.player_sprite.respawning and symbol == arcade.key.SPACE:
             bullet_sprite = BulletSprite("images/bullet.png", 0.08)
             bullet_sprite.guid = "Bullet"
 
-            bullet_speed = 13
+            bullet_speed = 14
             bullet_sprite.change_y = \
                 math.cos(math.radians(self.player_sprite.angle)) * bullet_speed
             bullet_sprite.change_x = \
@@ -172,9 +169,13 @@ class MyGame(arcade.Window):
             self.bullet_list.append(bullet_sprite)
 
         if symbol == arcade.key.A:
-            self.player_sprite.change_angle = 3
+            self.player_sprite.change_angle = 4
         elif symbol == arcade.key.D:
-            self.player_sprite.change_angle = -3
+            self.player_sprite.change_angle = -4
+
+    def on_mouse_motion(self, x, y, delta_x, delta_y):
+        self.player_sprite.center_x = x
+        self.player_sprite.center_y = y
 
     def split_enemy_(self, enemy: EnemySprite):
         x = enemy.center_x
@@ -184,8 +185,7 @@ class MyGame(arcade.Window):
         if enemy.size == 4:
             for i in range(3):
                 image_no = random.randrange(2)
-                image_list = ["images/escape pod.gif",
-                              "images/escape pod.gif"]
+                image_list = ["images/escape pod.gif", "images/escape pod.gif"]
 
                 enemy_sprite = EnemySprite(image_list[image_no],
                                               SCALE * 1)
@@ -205,8 +205,7 @@ class MyGame(arcade.Window):
         elif enemy.size == 3:
             for i in range(3):
                 image_no = random.randrange(2)
-                image_list = ["images/alien.png",
-                              "images/alien.png"]
+                image_list = ["images/alien.png", "images/alien.png"]
 
                 enemy_sprite = EnemySprite(image_list[image_no],
                                                 SCALE * 0.5)
@@ -276,7 +275,7 @@ class MyGame(arcade.Window):
                         print("OBLITERATED")
                     else:
                         self.game_over = True
-                        print("Game over")
+                        print("GAME OVER")
 
 
 def main():
