@@ -24,13 +24,7 @@ class TurningSprite(arcade.Sprite):
 class ShipSprite(arcade.Sprite):
     def __init__(self, filename, scale):
         super().__init__(filename, scale)
-
-        self.thrust = 0
-        self.speed = 0
-        self.max_speed = 4
-        self.drag = 0.05
         self.respawning = 0
-
         self.respawn()
 
     def respawn(self):
@@ -46,27 +40,6 @@ class ShipSprite(arcade.Sprite):
             if self.respawning > 250:
                 self.respawning = 0
                 self.alpha = 255
-        if self.speed > 0:
-            self.speed -= self.drag
-            if self.speed < 0:
-                self.speed = 0
-
-        if self.speed < 0:
-            self.speed += self.drag
-            if self.speed > 0:
-                self.speed = 0
-
-        self.speed += self.thrust
-        if self.speed > self.max_speed:
-            self.speed = self.max_speed
-        if self.speed < -self.max_speed:
-            self.speed = -self.max_speed
-
-        self.change_x = -math.sin(math.radians(self.angle)) * self.speed
-        self.change_y = math.cos(math.radians(self.angle)) * self.speed
-
-        self.center_x += self.change_x
-        self.center_y += self.change_y
 
         super().update()
 
@@ -103,6 +76,7 @@ class MyGame(arcade.Window):
         os.chdir(file_path)
 
         self.frame_count = 0
+        self.set_mouse_visible(False)
         self.game_over = False
         self.all_sprites_list = None
         self.enemy_list = None
@@ -138,21 +112,22 @@ class MyGame(arcade.Window):
         image_list = ("images/enemy1.gif",
                       "images/enemy1.gif",
                       "images/enemy1.gif",
+                      "images/enemy1.gif",
                       "images/enemy1.gif")
 
         for i in range(STARTING_ENEMY_COUNT):
-            image_no = random.randrange(4)
-            enemy_sprite = EnemySprite(image_list[image_no], 0.3)
+            image_nu = random.randrange(5)
+            enemy_sprite = EnemySprite(image_list[image_nu], 0.3)
             enemy_sprite.guid = "Enemy"
 
             enemy_sprite.center_y = random.randrange(BOTTOM_LIMIT, TOP_LIMIT)
             enemy_sprite.center_x = random.randrange(LEFT_LIMIT, RIGHT_LIMIT)
 
-            enemy_sprite.change_x = random.random() * 2 - 1
-            enemy_sprite.change_y = random.random() * 2 - 1
+            enemy_sprite.change_x = random.random() * 3 - 1
+            enemy_sprite.change_y = random.random() * 3 - 1
 
-            enemy_sprite.change_angle = (random.random() - 0.5) * 2
-            enemy_sprite.size = 4
+            enemy_sprite.change_angle = (random.random() - 0.5) * 3
+            enemy_sprite.size = 3
             self.all_sprites_list.append(enemy_sprite)
             self.enemy_list.append(enemy_sprite)
 
@@ -162,21 +137,20 @@ class MyGame(arcade.Window):
         self.all_sprites_list.draw()
 
         output = f"Score: {self.score}"
-        arcade.draw_text(output, 1250, 70, arcade.color.WHITE, 13)
+        arcade.draw_text(output, 1250, 70, arcade.color.WHITE, 14)
 
         output = f"Enemies Obliterated: {len(self.enemy_list)}"
-        arcade.draw_text(output, 1250, 50, arcade.color.WHITE, 13)
+        arcade.draw_text(output, 1250, 50, arcade.color.WHITE, 14)
 
     def on_key_release(self, symbol, modifiers):
-        """ Called whenever a key is released. """
-        if symbol == arcade.key.LEFT:
+        if symbol == arcade.key.A:
             self.player_sprite.change_angle = 0
-        elif symbol == arcade.key.RIGHT:
+        elif symbol == arcade.key.D:
             self.player_sprite.change_angle = 0
-        elif symbol == arcade.key.UP:
-            self.player_sprite.thrust = 0
-        elif symbol == arcade.key.DOWN:
-            self.player_sprite.thrust = 0
+
+    def on_mouse_motion(self, x, y, delta_x, delta_y):
+        self.player_sprite.center_x = x
+        self.player_sprite.center_y = y
 
     def on_key_press(self, symbol, modifiers):
         if not self.player_sprite.respawning and symbol == arcade.key.SPACE:
@@ -197,14 +171,10 @@ class MyGame(arcade.Window):
             self.all_sprites_list.append(bullet_sprite)
             self.bullet_list.append(bullet_sprite)
 
-        if symbol == arcade.key.LEFT:
+        if symbol == arcade.key.A:
             self.player_sprite.change_angle = 3
-        elif symbol == arcade.key.RIGHT:
+        elif symbol == arcade.key.D:
             self.player_sprite.change_angle = -3
-        elif symbol == arcade.key.UP:
-            self.player_sprite.thrust = 0.15
-        elif symbol == arcade.key.DOWN:
-            self.player_sprite.thrust = -.2
 
     def split_enemy_(self, enemy: EnemySprite):
         x = enemy.center_x
@@ -291,8 +261,8 @@ class MyGame(arcade.Window):
 
                 for enemy in enemies:
                     self.split_enemy_(enemy)
-                    enemy.kill()
                     bullet.kill()
+                    enemy.kill()
 
             if not self.player_sprite.respawning:
                 enemies = arcade.check_for_collision_with_list(self.player_sprite, self.enemy_list)
@@ -303,7 +273,7 @@ class MyGame(arcade.Window):
                         self.split_enemy_(enemies[0])
                         enemies[0].kill()
                         self.ship_life_list.pop().kill()
-                        print("Crash")
+                        print("OBLITERATED")
                     else:
                         self.game_over = True
                         print("Game over")
