@@ -140,7 +140,7 @@ class MyGame(arcade.Window):
         output = f"Score: {self.score}"
         arcade.draw_text(output, 1250, 70, arcade.color.BLACK_BEAN, 15)
 
-        output = f"Enemies Obliterated: {len(self.enemy_list)}"
+        output = f"Enemies Count: {len(self.enemy_list)}"
         arcade.draw_text(output, 1250, 50, arcade.color.RED_DEVIL, 15)
 
     def on_key_release(self, symbol, modifiers):
