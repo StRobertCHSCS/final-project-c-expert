@@ -3,9 +3,9 @@
 #### Your Job is to clean and prevent aliens from entering Earth's Space Zone!
 #### Controls:
 
-#####1. Your Controls are A to angle your craft left and D to angle your craft right
-#####2. Your mouse is you key movement 
-#####3. Space to shoot your lasers
+##### 1. Your Controls are A to angle your craft left and D to angle your craft right
+##### 2. Your mouse is you key movement 
+##### 3. Space to shoot your lasers
 
 #### Instructions: 
 
